@@ -3,6 +3,9 @@ import type { NextAuthOptions } from "next-auth";
 import { prisma } from "@/lib/db";
 
 export const authOptions: NextAuthOptions = {
+  pages: {
+    signIn: "/",
+  },
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,

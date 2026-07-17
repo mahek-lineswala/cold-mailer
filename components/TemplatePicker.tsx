@@ -9,7 +9,7 @@ interface TemplatePickerProps {
 
 export default function TemplatePicker({ selected, onSelect }: TemplatePickerProps) {
   return (
-    <div className="flex gap-2 mb-5 flex-wrap">
+    <div className="flex gap-2 mb-6 bg-neutral-100 dark:bg-neutral-800 p-1 rounded-xl w-fit">
       {(Object.keys(templates) as TemplateKey[]).map((key) => (
         <button
           key={key}
@@ -17,8 +17,8 @@ export default function TemplatePicker({ selected, onSelect }: TemplatePickerPro
           onClick={() => onSelect(key)}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
             selected === key
-              ? "bg-indigo-600 text-white"
-              : "bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 border border-neutral-300 dark:border-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-700"
+              ? "bg-indigo-600 text-white shadow-sm"
+              : "text-neutral-600 dark:text-neutral-300 hover:bg-white dark:hover:bg-neutral-700"
           }`}
         >
           {templates[key].label}

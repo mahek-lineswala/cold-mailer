@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Paperclip, FileText, X } from "lucide-react";
 
 export interface AttachmentData {
   filename: string;
@@ -18,12 +19,7 @@ export default function AttachmentUploader({ onChange }: AttachmentUploaderProps
   function fileToBase64(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = () => {
-        const result = reader.result as string;
-        // strip the "data:mime/type;base64," prefix — Gmail API just wants raw base64
-        const base64 = result.split(",")[1];
-        resolve(base64);
-      };
+      reader.onload = () => resolve((reader.result as string).split(",")[1]);
       reader.onerror = reject;
       reader.readAsDataURL(file);
     });
@@ -32,7 +28,6 @@ export default function AttachmentUploader({ onChange }: AttachmentUploaderProps
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const selected = e.target.files;
     if (!selected) return;
-
     const newAttachments: AttachmentData[] = [];
     for (const file of Array.from(selected)) {
       const base64Data = await fileToBase64(file);
@@ -42,7 +37,6 @@ export default function AttachmentUploader({ onChange }: AttachmentUploaderProps
         base64Data,
       });
     }
-
     const updated = [...files, ...newAttachments];
     setFiles(updated);
     onChange(updated);
@@ -54,29 +48,32 @@ export default function AttachmentUploader({ onChange }: AttachmentUploaderProps
     onChange(updated);
   }
 
- return (
+  return (
     <div className="mt-4">
-      <label className="inline-block px-4 py-2 text-sm rounded-lg border border-neutral-300 dark:border-neutral-600 text-neutral-700 dark:text-neutral-200 bg-white dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 cursor-pointer">
-        Attach files
-        <input type="file" multiple onChange={handleFileChange} className="hidden" />
-      </label>
-      <ul className="mt-2 space-y-1">
-        {files.map((f, i) => (
-          <li
-            key={i}
-            className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-300"
-          >
-            {f.filename} ({Math.round((f.base64Data.length * 0.75) / 1024)} KB)
-            <button
-              type="button"
-              onClick={() => removeFile(i)}
-              className="text-red-500 hover:text-red-600 text-xs"
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">Attachments</span>
+        <label className="flex items-center gap-1.5 text-sm font-medium text-indigo-600 dark:text-indigo-400 cursor-pointer hover:text-indigo-700">
+          <Paperclip className="w-4 h-4" />
+          Attach files
+          <input type="file" multiple onChange={handleFileChange} className="hidden" />
+        </label>
+      </div>
+      {files.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {files.map((f, i) => (
+            <div
+              key={i}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-neutral-800 border border-indigo-100 dark:border-neutral-700 text-sm text-neutral-700 dark:text-neutral-200"
             >
-              Remove
-            </button>
-          </li>
-        ))}
-      </ul>
+              <FileText className="w-4 h-4 text-indigo-500" />
+              {f.filename} ({Math.round((f.base64Data.length * 0.75) / 1024)}KB)
+              <button type="button" onClick={() => removeFile(i)} className="text-neutral-400 hover:text-red-500">
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
