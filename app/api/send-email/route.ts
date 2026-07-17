@@ -5,18 +5,19 @@ import { sendEmail } from "@/lib/gmail";
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
 
-  if (!session || !(session as any).accessToken) {
+  if (!session?.user?.email) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const { to, subject, html } = await req.json();
+  const { to, subject, html, attachments } = await req.json();
 
   try {
     await sendEmail({
-      accessToken: (session as any).accessToken,
+      userEmail: session.user.email,
       to,
       subject,
       html,
+      attachments,
     });
     return Response.json({ success: true });
   } catch (err: any) {
